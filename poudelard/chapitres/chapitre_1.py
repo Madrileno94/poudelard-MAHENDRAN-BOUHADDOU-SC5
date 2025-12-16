@@ -1,6 +1,6 @@
 from poudelard.univers.personnage import initialiser_personnage, afficher_personnage
 from poudelard.utils.input_utils import demander_texte, demander_nombre
-
+from input_utils import demander_choix
 
 def introduction():
     print("Bienvenue à Poudlard !")
@@ -45,7 +45,6 @@ def recevoir_lettre():
         print("Vous déchirez la lettre, l’oncle Vernon pousse un cri de joie: EXCELLENT  Enfin quelqu’un de NORMAL dans cette maison Le monde magique ne saura jamais que vous existiez... Fin du jeu.")
         exit()
 
-from input_utils import demander_choix
 def rencontrer_hagrid(personnage):
     prenom = personnage["Prenom"]
     print(f"\nHagrid : 'Salut {prenom} ! Je suis venu t'aider à faire tes achats sur le Chemin de Traverse.'")
