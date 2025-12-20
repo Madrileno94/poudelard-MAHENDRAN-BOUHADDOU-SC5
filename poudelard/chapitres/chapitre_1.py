@@ -47,25 +47,102 @@ def recevoir_lettre():
 
 def rencontrer_hagrid(personnage):
     prenom = personnage["Prenom"]
-    print(f"\nHagrid : 'Salut {prenom} ! Je suis venu t'aider à faire tes achats sur le Chemin de Traverse.'")
+    print(f"Hagrid : 'Salut {prenom} ! Je suis venu t'aider à faire tes achats sur le Chemin de Traverse.'")
     choix = demander_choix("Voulez-vous suivre Hagrid ?", ["Oui", "Non"])
     if choix == "Non":
-        print("\nHagrid insiste gentiment et vous entraîne quand même avec lui !")
+        print("Hagrid insiste gentiment et vous entraîne quand même avec lui !")
     else:
-        print("\nVous suivez Hagrid avec enthousiasme vers l'arrière-cour.")
+        print("Vous suivez Hagrid avec enthousiasme vers l'arrière-cour.")
+
 
 
 def acheter_forunitures(personnage):
-    boutique = load_fichier("data/inventaire.json")
+    boutique = load_fichier("../data/inventaire.json")
     objets_obligatoires = ["Baguette magique", "Robe de sorcier", "Manuel de potions"]
 
     while len(objets_obligatoires) > 0:
         print("\nCatalogue des objets disponibles :")
-        for i in range(len(boutique)):
-            article = boutique[i]
-            print(f"{i + 1}. {article['nom']} - {article['prix']} gallions")
-        print(f"\nVous avez {personnage['Argent']} gallions.")
 
+        # Affichage en ordre 1..n (les clés sont des strings "1", "2", ...)
+        nb_articles = len(boutique)
+        num = 1
+        while num <= nb_articles:
+            cle = str(num)
+            article = boutique[cle]          # ["Nom", prix]
+            nom_article = article[0]
+            prix_article = article[1]
+            print(f"{num}. {nom_article} - {prix_article} gallions")
+            num += 1
+
+        print(f"\nVous avez {personnage['argent']} gallions.")
         print(f"Objets obligatoires restants à acheter : {', '.join(objets_obligatoires)}")
 
-        choix = demander_nombre("Entrez le numéro de l'objet à acheter : ", 1, len(boutique))
+        # Trouver le prix minimum des objets obligatoires encore restants
+        prix_min = None
+        num = 1
+        while num <= nb_articles:
+            cle = str(num)
+            nom_article = boutique[cle][0]
+            prix_article = boutique[cle][1]
+
+            if nom_article in objets_obligatoires:
+                if prix_min is None or prix_article < prix_min:
+                    prix_min = prix_article
+            num += 1
+
+        # Si on ne trouve aucun objet obligatoire dans la boutique (problème de données)
+        if prix_min is None:
+            print("Erreur : objets obligatoires introuvables dans la boutique.")
+            return
+
+        # Si le joueur ne peut même pas acheter le moins cher obligatoire : stop
+        if personnage["argent"] < prix_min:
+            print("Vous n'avez plus assez d'argent pour acheter les objets obligatoires.")
+            print("Fin des achats.")
+            return
+
+        # Choix de l'objet (entre 1 et nb_articles)
+        choix = demander_nombre("Entrez le numéro de l'objet à acheter : ", 1, nb_articles)
+
+        article_choisi = boutique[str(choix)]
+        nom_choisi = article_choisi[0]
+        prix_choisi = article_choisi[1]
+
+        # Vérifier argent
+        if personnage["argent"] < prix_choisi:
+            print("Vous n'avez pas assez d'argent pour cet objet.")
+        else:
+            # Empêcher l'achat en double (optionnel mais utile)
+            if nom_choisi in personnage["Inventaires"]:
+                print("Vous avez déjà cet objet.")
+            else:
+                personnage["argent"] = personnage["argent"] - prix_choisi
+                personnage["Inventaires"].append(nom_choisi)
+                print(f"Vous avez acheté : {nom_choisi} ({prix_choisi} gallions).")
+
+                if nom_choisi in objets_obligatoires:
+                    objets_obligatoires.remove(nom_choisi)
+
+    print("Vous avez acheté tous les objets obligatoires !")
+
+
+
+
+def lancer_chapitre_1():
+
+    introduction()
+
+    personnage = creer_personnage()
+
+    recevoir_lettre()
+
+    rencontrer_hagrid(personnage)
+
+    acheter_forunitures(personnage)
+
+    print("Fin du Chapitre 1 ! Votre aventure commence à Poudlard...")
+
+    return personnage
+
+
+lancer_chapitre_1()

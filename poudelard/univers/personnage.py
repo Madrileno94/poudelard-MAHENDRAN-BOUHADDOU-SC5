@@ -1,10 +1,10 @@
 def initialiser_personnage(nom,prenom,attributs):
     joueur={
         "nom":nom,
-        "prenom":prenom,
+        "Prenom":prenom,
         "argent":100,
-        "Inventaires":"[]",
-        "attributs":[]
+        "Inventaires":[],
+        "attributs": attributs
     }
     return joueur
 def afficher_personnage(joueur):
@@ -25,7 +25,6 @@ def afficher_personnage(joueur):
                 elements = ", ".join(str(x) for x in valeur)
                 print(f"{cle} : {elements}")
 
-        # Sinon → valeur simple
         else:
             print(f"{cle} : {valeur}")
 
