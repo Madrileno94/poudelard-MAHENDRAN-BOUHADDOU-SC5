@@ -189,19 +189,8 @@ def lancer_chapitre_2(personnage):
     # 6) Fin du chapitre
     print("Fin du Chapitre 2 ! Les cours commencent à Poudlard...")
 
-personnage = {
-    "nom": "Test",
-    "Prenom": "Eleve",
-    "argent": 100,
-    "Inventaires": [],
-    "attributs": {
-        "courage": 8,
-        "intelligence": 8,
-        "loyauté": 8,
-        "ambition": 8
-    },
-    "Maison": ""
-}
+
+
 
 lancer_chapitre_2(personnage)
 
