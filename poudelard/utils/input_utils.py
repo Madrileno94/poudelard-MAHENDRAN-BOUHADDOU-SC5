@@ -35,12 +35,12 @@ def demander_nombre(message, min_val=None, max_val=None):
             if valide:
                 nombre = int(saisie)
 
-                # Vérification min
+
                 if min_val is not None and nombre < min_val:
                     print(f"Veuillez entrer un nombre ≥ {min_val}.")
                     valide = False
 
-                # Vérification max
+
                 if max_val is not None and nombre > max_val:
                     print(f"Veuillez entrer un nombre ≤ {max_val}.")
                     valide = False
