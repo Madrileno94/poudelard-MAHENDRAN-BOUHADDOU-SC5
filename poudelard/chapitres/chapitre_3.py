@@ -65,6 +65,15 @@ def quiz_magie(joueur, chemin_fichier="data/quiz_magie.json"):
         joueur["Score"] = 0
     joueur["Score"] += score_quiz
 
+from univers.maison import actualiser_points_maison, afficher_maison_gagnante
+from univers.personnage import afficher_personnage
+
+def lancer_chapitre_3(personnage, maisons):
+    apprendre_sorts(personnage)
+    quiz_magie(personnage)
+    actualiser_points_maison(personnage, maisons)
+    afficher_maison_gagnante(maisons)
+    afficher_personnage(personnage)
 
 
 
