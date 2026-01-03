@@ -29,7 +29,7 @@ def afficher_personnage(joueur):
             print(f"{cle} : {valeur}")
 
 def modifier_argent(joueur, montant):
-    joueur["Argent"] = joueur["Argent"] + montant
+    joueur["argent"] = joueur["argent"] + montant
 
 def ajouter_objet(joueur, cle, objet):
     joueur[cle].append(objet)

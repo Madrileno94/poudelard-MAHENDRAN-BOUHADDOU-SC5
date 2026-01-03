@@ -1,27 +1,84 @@
+from poudelard.utils.input_utils import demander_nombre
+
+
 def actualiser_points_maison(maisons, nom_maison, points):
-    if nom_maison in maisons:
+    if points is None:
+        points = 0
+
+    if nom_maison not in maisons:
+        print("Maison introuvable.")
+        return
+
+    if type(maisons[nom_maison]) == int:
         maisons[nom_maison] = maisons[nom_maison] + points
         print(f"{nom_maison} gagne {points} points. Nouveau total : {maisons[nom_maison]}")
-    else:
-        print("Maison introuvable.")
+        return
+
+    if type(maisons[nom_maison]) == dict:
+        if "points" in maisons[nom_maison]:
+            maisons[nom_maison]["points"] = maisons[nom_maison]["points"] + points
+            total = maisons[nom_maison]["points"]
+        elif "Points" in maisons[nom_maison]:
+            maisons[nom_maison]["Points"] = maisons[nom_maison]["Points"] + points
+            total = maisons[nom_maison]["Points"]
+        elif "score" in maisons[nom_maison]:
+            maisons[nom_maison]["score"] = maisons[nom_maison]["score"] + points
+            total = maisons[nom_maison]["score"]
+        elif "Score" in maisons[nom_maison]:
+            maisons[nom_maison]["Score"] = maisons[nom_maison]["Score"] + points
+            total = maisons[nom_maison]["Score"]
+        else:
+            print("Format de maison inconnu.")
+            return
+
+        print(f"{nom_maison} gagne {points} points. Nouveau total : {total}")
+
 
 def afficher_maison_gagnante(maisons):
+    print(maisons)
     score_max = None
-    for maison in maisons:
-        if score_max is None or maisons[maison] > score_max:
-            score_max = maisons[maison]
 
-    gagnant = []
+    for nom_maison in maisons:
+        valeur = maisons[nom_maison]
 
-    for maison in maisons:
-        if maisons[maison] == score_max:
-            gagnant.append(maison)
-    if len(gagnant) == 1:
-        print("La maison gagnante est", gagnant[0], "avec", score_max, "points")
+        # valeur peut être un int ou un dict
+        if isinstance(valeur, dict):
+            if "points" in valeur:
+                score = valeur["points"]
+            elif "score" in valeur:
+                score = valeur["score"]
+            else:
+                score = 0
+        else:
+            score = valeur
+
+        if score_max is None or score > score_max:
+            score_max = score
+
+    gagnantes = []
+    for nom_maison in maisons:
+        valeur = maisons[nom_maison]
+
+        if isinstance(valeur, dict):
+            if "points" in valeur:
+                score = valeur["points"]
+            elif "score" in valeur:
+                score = valeur["score"]
+            else:
+                score = 0
+        else:
+            score = valeur
+
+        if score == score_max:
+            gagnantes.append(nom_maison)
+
+    if len(gagnantes) == 1:
+        print("La maison gagnante est", gagnantes[0], "avec", score_max, "points !")
     else:
         print("Égalité entre les maisons suivantes avec", score_max, "points :")
-        for maison in gagnant:
-            print("--", maison)
+        for m in gagnantes:
+            print("-", m)
+
 
 
 def repartition_maison(joueur, questions):
@@ -29,57 +86,40 @@ def repartition_maison(joueur, questions):
         "Gryffondor": 0,
         "Serpentard": 0,
         "Poufsouffle": 0,
-        "Serdaigle": 0 }
+        "Serdaigle": 0
+    }
 
-    def repartition_maison(joueur, questions):
-        scores = {
-            "Gryffondor": 0,
-            "Serpentard": 0,
-            "Poufsouffle": 0,
-            "Serdaigle": 0
-        }
+    attributs = joueur["Attributs"]
 
-        for question in questions:
-            texte = question[0]
-            choix_possibles = question[1]
-            maisons_associees = question[2]
+    scores["Gryffondor"] += attributs["courage"] * 2
+    scores["Serpentard"] += attributs["ambition"] * 2
+    scores["Poufsouffle"] += attributs["loyaute"] * 2
+    scores["Serdaigle"] += attributs["intelligence"] * 2
 
-            print(texte)
+    for question, choix_possibles, maisons_associees in questions:
+        print(question)
 
-            numero = 1
-            for option in choix_possibles:
-                print(f"{numero}. {option}")
-                numero += 1
+        i = 0
+        while i < len(choix_possibles):
+            print(f"{i + 1}. {choix_possibles[i]}")
+            i += 1
 
-            choix = demander_nombre("Ton choix : ", 1, len(choix_possibles))
-            maison = maisons_associees[choix - 1]
-
-            scores[maison] += 3
-            print()
-
-        maison_gagnante = None
-        score_max = None
-
-        for maison in scores:
-            if score_max is None or scores[maison] > score_max:
-                score_max = scores[maison]
-                maison_gagnante = maison
-
-        attributs = joueur["Attributs"]
-
-        if maison_gagnante == "Gryffondor":
-            scores["Gryffondor"] += attributs["courage"] * 2
-        elif maison_gagnante == "Serpentard":
-            scores["Serpentard"] += attributs["ambition"] * 2
-        elif maison_gagnante == "Poufsouffle":
-            scores["Poufsouffle"] += attributs["loyauté"] * 2
-        elif maison_gagnante == "Serdaigle":
-            scores["Serdaigle"] += attributs["intelligence"] * 2
-
-        print("Résumé des scores :")
-        for maison in scores:
-            print(f"{maison} : {scores[maison]} points")
+        choix = demander_nombre("Ton choix : ", 1, len(choix_possibles))
+        maison = maisons_associees[choix - 1]
+        scores[maison] += 3
         print()
 
-        return maison_gagnante
+    maison_gagnante = None
+    score_max = None
 
+    for maison in scores:
+        if score_max is None or scores[maison] > score_max:
+            score_max = scores[maison]
+            maison_gagnante = maison
+
+    print("Résumé des scores :")
+    for maison in scores:
+        print(f"{maison} : {scores[maison]} points")
+    print()
+
+    return maison_gagnante

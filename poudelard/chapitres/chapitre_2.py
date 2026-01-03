@@ -13,7 +13,6 @@ def rencontrer_amis(joueur):
 
     attributs = joueur["attributs"]
 
-
     print("Un garçon roux entre dans votre compartiment, l’air amical.")
     print("— Salut ! Moi c’est Ron Weasley. Tu veux bien qu’on s’assoie")
     print("ensemble ?")
@@ -24,7 +23,7 @@ def rencontrer_amis(joueur):
 
     if choix == 1:
         print("Ron sourit : — Génial ! Tu verras, Poudlard, c’est incroyable !")
-        attributs["loyauté"] = attributs["loyauté"] + 1
+        attributs["loyaute"] = attributs["loyaute"] + 1
     else:
         print("Ron hausse les épaules : — Pas de souci... Peut-être plus tard !")
         attributs["ambition"] = attributs["ambition"] + 1
@@ -129,7 +128,7 @@ def ceremonie_repartition(joueur):
 
 def installation_salle_commune(joueur):
 
-    maisons = load_fichier("../data/maisons.json")
+    maisons = load_fichier("data/maisons.json")
 
     maison_joueur = joueur["Maison"]
 
@@ -190,7 +189,5 @@ def lancer_chapitre_2(personnage):
 
 
 
-
-lancer_chapitre_2(personnage)
 
 

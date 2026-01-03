@@ -1,4 +1,4 @@
-from poudelard.univers.personnage import initialiser_personnage, afficher_personnage
+from poudelard.univers.personnage import initialiser_personnage, afficher_personnage, ajouter_objet, modifier_argent
 from poudelard.utils.input_utils import demander_texte, demander_nombre, load_fichier, demander_choix
 
 
@@ -23,11 +23,13 @@ def creer_personnage():
     attributs = {
         "courage": courage,
         "intelligence": intelligence,
-        "loyauté": loyaute,
+        "loyaute": loyaute,
         "ambition": ambition
     }
 
     joueur = initialiser_personnage(nom, prenom, attributs)
+    joueur["Attributs"] = attributs
+    joueur["attributs"] = attributs
 
     afficher_personnage(joueur)
 
@@ -55,32 +57,64 @@ def rencontrer_hagrid(personnage):
         print("\nVous suivez Hagrid avec enthousiasme vers l'arrière-cour.")
 
 
-def acheter_forunitures(personnage):
+def acheter_fournitures(personnage):
     boutique = load_fichier("data/inventaire.json")
+
     objets_obligatoires = ["Baguette magique", "Robe de sorcier", "Manuel de potions"]
 
     while len(objets_obligatoires) > 0:
         print("\nCatalogue des objets disponibles :")
-        for i in range(len(boutique)):
-            article = boutique[i]
-            print(f"{i + 1}. {article['nom']} - {article['prix']} gallions")
-        print(f"\nVous avez {personnage['Argent']} gallions.")
+        cles = list(boutique.keys())
 
-        print(f"Objets obligatoires restants à acheter : {', '.join(objets_obligatoires)}")
+        i = 0
+        while i < len(cles):
+            cle = cles[i]                 # "1", "2", ...
+            nom_objet = boutique[cle][0]  # ex: "Baguette magique"
+            prix = boutique[cle][1]       # ex: 35
+            print(f"{i + 1}. {nom_objet} - {prix} gallions")
+            i += 1
 
-        choix = demander_nombre("Entrez le numéro de l'objet à acheter : ", 1, len(boutique))
+        print(f"\nVous avez {personnage['argent']} gallions.")
+        print("Objets obligatoires restants à acheter :", ", ".join(objets_obligatoires))
 
-        def lancer_chapitre_1():
+        choix = demander_nombre(
+            "Entrez le numéro de l'objet à acheter : ",
+            1,
+            len(cles)
+        )
 
-            introduction()
+        cle_choisie = cles[choix - 1]
+        nom_objet = boutique[cle_choisie][0]
+        prix = boutique[cle_choisie][1]
 
-            personnage = creer_personnage()
+        if personnage["argent"] < prix:
+            print("Vous n'avez pas assez d'argent. Fin du jeu.")
+            exit()
 
-            recevoir_lettre()
+        ajouter_objet(personnage, "Inventaires", nom_objet)
+        modifier_argent(personnage, -prix)
+        print(f"Vous avez acheté : {nom_objet} (-{prix} gallions).")
 
-            rencontrer_hagrid(personnage)
+        if nom_objet in objets_obligatoires:
+            objets_obligatoires.remove(nom_objet)
 
-            acheter_forunitures(personnage)
+    print("\nTous les objets obligatoires ont été achetés avec succès !")
 
-            print("Fin du Chapitre 1 ! Votre aventure commence à Poudlard...")
-            return personnage
+
+
+
+
+def lancer_chapitre_1():
+
+    introduction()
+
+    personnage = creer_personnage()
+
+    recevoir_lettre()
+
+    rencontrer_hagrid(personnage)
+
+    acheter_fournitures(personnage)
+
+    print("Fin du Chapitre 1 ! Votre aventure commence à Poudlard...")
+    return personnage

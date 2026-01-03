@@ -1,6 +1,9 @@
 import random
-from utils.input_utils import load_fichier
-from univers.maison import actualiser_points_maison
+
+
+from poudelard.univers.maison import afficher_maison_gagnante, actualiser_points_maison
+from poudelard.univers.personnage import afficher_personnage
+from poudelard.utils.input_utils import load_fichier
 
 
 def creer_equipe(maison, equipe_data, est_joueur=False, joueur=None):
@@ -14,7 +17,7 @@ def creer_equipe(maison, equipe_data, est_joueur=False, joueur=None):
     }
 
     if est_joueur and joueur:
-        nom_complet = f"{joueur['Prenom']} {joueur['Nom']}"
+        nom_complet = f"{joueur['Prenom']} {joueur['nom']}"
         nouvelle_liste = [f"{nom_complet} (Attrapeur)"]
 
         for j in equipe_data:
@@ -33,7 +36,11 @@ def tentative_marque(equipe_attaque, equipe_defense, joueur_est_joueur=False):
         if joueur_est_joueur == True:
             buteur = equipe_attaque["joueurs"][0]
         else:
-            buteur = random.choice(equipe_attaque["joueurs"])
+            liste_joueurs = []
+            for j in equipe_attaque["joueurs"]:
+                liste_joueurs.append(equipe_attaque["joueurs"][j])
+
+            buteur = random.choice(liste_joueurs)
 
         equipe_attaque["score"] += 10
         equipe_attaque["a_marque"] += 1
@@ -76,8 +83,30 @@ def afficher_equipe(equipe):
 
 def match_quidditch(joueur, maisons):
     data_equipes = load_fichier("data/equipes_quidditch.json")
+
+    if "Maison" not in joueur:
+        print("Erreur : la maison du joueur n'est pas définie.")
+        print("Clés disponibles :", list(joueur.keys()))
+        return
+
     maison_joueur = joueur["Maison"]
-    adversaires_possibles = [m["Nom"] for m in maisons if m["Nom"] != maison_joueur]
+    if "Maison" not in joueur:
+        print("Erreur : clé 'Maison' absente du joueur.")
+        print("Clés disponibles :", list(joueur.keys()))
+        return
+
+    maison_joueur = joueur["Maison"]
+
+    if maison_joueur is None:
+        print("Erreur : la maison du joueur vaut None (répartition pas faite ou bug).")
+        print("Joueur =", joueur)
+        return
+
+    adversaires_possibles = []
+    for nom in maisons:
+        if nom != maison_joueur:
+            adversaires_possibles.append(nom)
+
     maison_adverse = random.choice(adversaires_possibles)
 
     equipe_j = creer_equipe(maison_joueur, data_equipes[maison_joueur], True, joueur)
@@ -94,7 +123,7 @@ def match_quidditch(joueur, maisons):
         if match_fini:
             break
 
-        print(f"━━━ Tour {tour} ━━━")
+        print(f"---- Tour {tour} ----")
         tentative_marque(equipe_j, equipe_adv, True)
         tentative_marque(equipe_adv, equipe_j, False)
         afficher_score(equipe_j, equipe_adv)
@@ -120,12 +149,10 @@ def match_quidditch(joueur, maisons):
         nom_vainqueur = equipe_j["nom"]
         score_vainqueur = equipe_j["score"]
         print(f"La maison gagnante est {nom_vainqueur} avec {score_vainqueur} points !")
-        print(f"{nom_vainqueur} remporte le match !")
     elif equipe_adv["score"] > equipe_j["score"]:
         nom_vainqueur = equipe_adv["nom"]
         score_vainqueur = equipe_adv["score"]
         print(f"La maison gagnante est {nom_vainqueur} avec {score_vainqueur} points !")
-        print(f"{nom_vainqueur} remporte le match...")
     else:
         print("Match nul !")
         return
@@ -134,16 +161,20 @@ def match_quidditch(joueur, maisons):
     print(f"+500 points pour {nom_vainqueur} ! Total : {points_totaux} points.")
 
     if nom_vainqueur == joueur["Maison"]:
-        joueur["Score"] = points_totaux
+        joueur["Score"] = joueur["Score"] + points_totaux
         actualiser_points_maison(joueur, maisons)
-    else:
-        for m in maisons:
-            if m["Nom"] == nom_vainqueur:
-                m["Points"] += points_totaux
 
-    for m in maisons:
-        if m["Nom"] == nom_vainqueur:
-            print(f"La maison gagnante est {m['Nom']} avec {m['Points']} points !")
+    if nom_vainqueur in maisons:
+        if type(maisons[nom_vainqueur]) == int:
+            maisons[nom_vainqueur] = maisons[nom_vainqueur] + points_totaux
+            print(f"La maison gagnante est {nom_vainqueur} avec {maisons[nom_vainqueur]} points !")
+        elif type(maisons[nom_vainqueur]) == dict:
+            if "points" in maisons[nom_vainqueur]:
+                maisons[nom_vainqueur]["points"] = maisons[nom_vainqueur]["points"] + points_totaux
+                print(f"La maison gagnante est {nom_vainqueur} avec {maisons[nom_vainqueur]['points']} points !")
+            elif "score" in maisons[nom_vainqueur]:
+                maisons[nom_vainqueur]["score"] = maisons[nom_vainqueur]["score"] + points_totaux
+                print(f"La maison gagnante est {nom_vainqueur} avec {maisons[nom_vainqueur]['score']} points !")
 
 
 def lancer_chapitre4_quidditch(joueur, maisons):
