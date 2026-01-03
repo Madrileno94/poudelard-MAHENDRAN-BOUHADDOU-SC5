@@ -69,3 +69,18 @@ def acheter_forunitures(personnage):
         print(f"Objets obligatoires restants à acheter : {', '.join(objets_obligatoires)}")
 
         choix = demander_nombre("Entrez le numéro de l'objet à acheter : ", 1, len(boutique))
+
+        def lancer_chapitre_1():
+
+            introduction()
+
+            personnage = creer_personnage()
+
+            recevoir_lettre()
+
+            rencontrer_hagrid(personnage)
+
+            acheter_forunitures(personnage)
+
+            print("Fin du Chapitre 1 ! Votre aventure commence à Poudlard...")
+            return personnage
