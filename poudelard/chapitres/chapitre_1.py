@@ -68,9 +68,9 @@ def acheter_fournitures(personnage):
 
         i = 0
         while i < len(cles):
-            cle = cles[i]                 # "1", "2", ...
-            nom_objet = boutique[cle][0]  # ex: "Baguette magique"
-            prix = boutique[cle][1]       # ex: 35
+            cle = cles[i]
+            nom_objet = boutique[cle][0]
+            prix = boutique[cle][1]
             print(f"{i + 1}. {nom_objet} - {prix} gallions")
             i += 1
 
