@@ -18,15 +18,7 @@ def actualiser_points_maison(maisons, nom_maison, points):
         if "points" in maisons[nom_maison]:
             maisons[nom_maison]["points"] = maisons[nom_maison]["points"] + points
             total = maisons[nom_maison]["points"]
-        elif "Points" in maisons[nom_maison]:
-            maisons[nom_maison]["Points"] = maisons[nom_maison]["Points"] + points
-            total = maisons[nom_maison]["Points"]
-        elif "score" in maisons[nom_maison]:
-            maisons[nom_maison]["score"] = maisons[nom_maison]["score"] + points
-            total = maisons[nom_maison]["score"]
-        elif "Score" in maisons[nom_maison]:
-            maisons[nom_maison]["Score"] = maisons[nom_maison]["Score"] + points
-            total = maisons[nom_maison]["Score"]
+
         else:
             print("Format de maison inconnu.")
             return
@@ -41,15 +33,13 @@ def afficher_maison_gagnante(maisons):
     for nom_maison in maisons:
         valeur = maisons[nom_maison]
 
-        if isinstance(valeur, dict):
-            if "points" in valeur:
-                score = valeur["points"]
-            elif "score" in valeur:
-                score = valeur["score"]
-            else:
-                score = 0
+
+        if "points" in valeur:
+            score = valeur["points"]
+
         else:
-            score = valeur
+            score = 0
+
 
         if score_max is None or score > score_max:
             score_max = score
@@ -58,15 +48,13 @@ def afficher_maison_gagnante(maisons):
     for nom_maison in maisons:
         valeur = maisons[nom_maison]
 
-        if isinstance(valeur, dict):
-            if "points" in valeur:
+
+        if "points" in valeur:
                 score = valeur["points"]
-            elif "score" in valeur:
-                score = valeur["score"]
-            else:
-                score = 0
+
         else:
-            score = valeur
+            score = 0
+
 
         if score == score_max:
             gagnantes.append(nom_maison)
